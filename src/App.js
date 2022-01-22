@@ -57,16 +57,20 @@ function App() {
         }
     }, [choiceTwo, choiceOne]);
 
+    useEffect(() => {
+        shuffleCards()
+    }, []);
+
 
     const shuffleCards = () => {
         const shuffledCards = [...cardImages, ...cardImages]
             .sort(() => Math.random() - 0.5)
             .map((card) => ({...card, id: Math.random()}))
+        setChoiceTwo(null)
+        setChoiceOne(null)
         setCards(shuffledCards)
         setTurns(0)
     }
-
-    console.log(cards)
 
     return (
         <div className="App">
@@ -83,6 +87,7 @@ function App() {
                     })
                 }
             </div>
+            <p>Turns : {turns}</p>
         </div>
     );
 }
