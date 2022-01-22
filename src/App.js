@@ -3,12 +3,12 @@ import {useEffect, useState} from "react";
 import SingleCard from "./components/SingleCard";
 
 const cardImages = [
-    {"src": "img/helmet-1.png"},
-    {"src": "img/potion-1.png"},
-    {"src": "img/ring-1.png"},
-    {"src": "img/scroll-1.png"},
-    {"src": "img/shield-1.png"},
-    {"src": "img/sword-1.png"},
+    {"src": "img/helmet-1.png", matched: false},
+    {"src": "img/potion-1.png", matched: false},
+    {"src": "img/ring-1.png", matched: false},
+    {"src": "img/scroll-1.png", matched: false},
+    {"src": "img/shield-1.png", matched: false},
+    {"src": "img/sword-1.png", matched: false},
 
 ]
 
@@ -18,6 +18,7 @@ function App() {
     const [turns, setTurns] = useState(0);
     const [choiceOne, setChoiceOne] = useState(null);
     const [choiceTwo, setChoiceTwo] = useState(null);
+    const [disabled, setDisabled] = useState(false);
 
     const handleClick = (card) => {
         if (choiceOne) {
@@ -33,17 +34,26 @@ function App() {
         setChoiceTwo(null)
         setChoiceOne(null)
         setTurns(turns + 1)
+        setDisabled(false)
     }
 
     useEffect(() => {
-        if (choiceTwo && choiceOne){
-           if ( choiceOne.src === choiceTwo.src){
-               console.log("matched")
-               resetTurn()
-           }else {
-               resetTurn()
-           }
-
+        if (choiceTwo && choiceOne) {
+            setDisabled(true)
+            if (choiceOne.src === choiceTwo.src) {
+                setCards(previousCards => {
+                    return previousCards.map(card => {
+                        if (card.src === choiceOne.src) {
+                            return {...card, matched: true}
+                        } else {
+                            return card
+                        }
+                    })
+                })
+                resetTurn()
+            } else {
+                setTimeout(() => resetTurn(), 1000)
+            }
         }
     }, [choiceTwo, choiceOne]);
 
@@ -56,6 +66,8 @@ function App() {
         setTurns(0)
     }
 
+    console.log(cards)
+
     return (
         <div className="App">
             <h1>Magic Match</h1>
@@ -65,7 +77,8 @@ function App() {
                 {
                     cards.map((card) => {
                         return (
-                            <SingleCard card={card} key={card.id} handleClick={handleClick}/>
+                            <SingleCard flipped={card === choiceOne || card === choiceTwo || card.matched} card={card}
+                                        key={card.id} handleClick={handleClick} disabled={disabled}/>
                         )
                     })
                 }
